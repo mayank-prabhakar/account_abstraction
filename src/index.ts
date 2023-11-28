@@ -69,7 +69,7 @@ async function createSmartAccount() {
   );
   console.log("owner of smart contract wallet is  : ", eoa);
   const address = await biconomySmartAccount.getAccountAddress();
-
+// get balance of smart contract wallet.
   const balance = await provider.getBalance(address);
   const balanceEther = ethers.utils.formatEther(balance);
   console.log(`balance of smart acount wallet  "${address}" is :  "${balanceEther}"`);
