@@ -1,0 +1,28 @@
+{
+  "name": "account-abstraction",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsc && node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "@biconomy/account": "^3.1.1",
+    "@biconomy/bundler": "^3.1.1",
+    "@biconomy/common": "^3.1.1",
+    "@biconomy/core-types": "^3.1.1",
+    "@biconomy/modules": "^3.1.1",
+    "@biconomy/particle-auth": "^3.1.1",
+    "@biconomy/paymaster": "^3.1.1",
+    "@types/node": "^20.9.3",
+    "dotenv": "^16.3.1",
+    "ethers": "^5.7.2",
+    "inquirer": "^9.2.12",
+    "node-typescript": "^0.1.3"
+  }
+}
