@@ -19,6 +19,7 @@
     "@biconomy/modules": "^3.1.1",
     "@biconomy/particle-auth": "^3.1.1",
     "@biconomy/paymaster": "^3.1.1",
+    "@metamask/sdk": "^0.13.0",
     "@types/node": "^20.9.3",
     "dotenv": "^16.3.1",
     "ethers": "^5.7.2",

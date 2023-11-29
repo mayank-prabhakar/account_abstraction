@@ -17,12 +17,30 @@ import {
   PaymasterMode,
   SponsorUserOperationDto,
 } from "@biconomy/paymaster";
+import { ParticleAuthModule, ParticleProvider } from "@biconomy/particle-auth";
 import { ethers } from "ethers";
+import { MetaMaskSDK } from '@metamask/sdk';
 
 import nftabi from "./abi/nft.json";
 import wmaticabi from "./abi/wmatic.json";
 
 config();
+// const MMSDK = new MetaMaskSDK();
+
+// const ethereum = MMSDK.getProvider();
+
+const particle = new ParticleAuthModule.ParticleNetwork({
+  projectId: "31b2d421-1b86-4a82-9dcf-346303f0488f",
+  clientKey: "cKzJlrUyiFCDb6NwrVPtBm0K0QJLQTMrvcwBKOxo",
+  // ServerKey:"sWlCSO1nUzQdlxrNQOkO4ya6nJmlo5PuX5XiER1o"
+  appId: "sWlCSO1nUzQdlxrNQOkO4ya6nJmlo5PuX5XiER1o",
+  wallet: {
+    displayWalletEntry: true,
+    defaultWalletEntryPosition: ParticleAuthModule.WalletEntryPosition.BR,
+  },
+});
+
+
 
 const address1: any = process.env.address1;
 const address2: any = process.env.address2;
@@ -47,11 +65,24 @@ const paymaster: IPaymaster = new BiconomyPaymaster({
 });
 
 async function createSmartAccount() {
-  const module = await ECDSAOwnershipValidationModule.create({
-    signer: wallet,
-    moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
-  });
+  const userInfo = await particle.auth.login();
+      console.log("Logged in user:", userInfo);
+      const particleProvider = new ParticleProvider(particle.auth);
+      const web3Provider = new ethers.providers.Web3Provider(
+        particleProvider,
+        "any"
+      );
 
+      const module = await ECDSAOwnershipValidationModule.create({
+      signer: web3Provider.getSigner(),
+      moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE
+      })
+
+  // const module = await ECDSAOwnershipValidationModule.create({
+  //   signer: wallet,
+  //   moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
+  // });
+  
   let biconomySmartAccount = await BiconomySmartAccountV2.create({
     chainId: ChainId.POLYGON_MUMBAI,
     bundler: bundler,

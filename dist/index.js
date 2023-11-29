@@ -18,10 +18,23 @@ const core_types_1 = require("@biconomy/core-types");
 const account_1 = require("@biconomy/account");
 const modules_1 = require("@biconomy/modules");
 const paymaster_1 = require("@biconomy/paymaster");
+const particle_auth_1 = require("@biconomy/particle-auth");
 const ethers_1 = require("ethers");
 const nft_json_1 = __importDefault(require("./abi/nft.json"));
 const wmatic_json_1 = __importDefault(require("./abi/wmatic.json"));
 (0, dotenv_1.config)();
+// const MMSDK = new MetaMaskSDK();
+// const ethereum = MMSDK.getProvider();
+const particle = new particle_auth_1.ParticleAuthModule.ParticleNetwork({
+    projectId: "31b2d421-1b86-4a82-9dcf-346303f0488f",
+    clientKey: "cKzJlrUyiFCDb6NwrVPtBm0K0QJLQTMrvcwBKOxo",
+    // ServerKey:"sWlCSO1nUzQdlxrNQOkO4ya6nJmlo5PuX5XiER1o"
+    appId: "sWlCSO1nUzQdlxrNQOkO4ya6nJmlo5PuX5XiER1o",
+    wallet: {
+        displayWalletEntry: true,
+        defaultWalletEntryPosition: particle_auth_1.ParticleAuthModule.WalletEntryPosition.BR,
+    },
+});
 const address1 = process.env.address1;
 const address2 = process.env.address2;
 const provider = new ethers_1.ethers.providers.JsonRpcProvider(process.env.providerapi);
@@ -39,10 +52,18 @@ const paymaster = new paymaster_1.BiconomyPaymaster({
 });
 function createSmartAccount() {
     return __awaiter(this, void 0, void 0, function* () {
+        const userInfo = yield particle.auth.login();
+        console.log("Logged in user:", userInfo);
+        const particleProvider = new particle_auth_1.ParticleProvider(particle.auth);
+        const web3Provider = new ethers_1.ethers.providers.Web3Provider(particleProvider, "any");
         const module = yield modules_1.ECDSAOwnershipValidationModule.create({
-            signer: wallet,
-            moduleAddress: modules_1.DEFAULT_ECDSA_OWNERSHIP_MODULE,
+            signer: web3Provider.getSigner(),
+            moduleAddress: modules_1.DEFAULT_ECDSA_OWNERSHIP_MODULE
         });
+        // const module = await ECDSAOwnershipValidationModule.create({
+        //   signer: wallet,
+        //   moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
+        // });
         let biconomySmartAccount = yield account_1.BiconomySmartAccountV2.create({
             chainId: core_types_1.ChainId.POLYGON_MUMBAI,
             bundler: bundler,
@@ -56,6 +77,7 @@ function createSmartAccount() {
         console.log(`smart account address is : "${yield biconomySmartAccount.getAccountAddress()}" and nonce is : ${nonce}`);
         console.log("owner of smart contract wallet is  : ", eoa);
         const address = yield biconomySmartAccount.getAccountAddress();
+        // get balance of smart contract wallet.
         const balance = yield provider.getBalance(address);
         const balanceEther = ethers_1.ethers.utils.formatEther(balance);
         console.log(`balance of smart acount wallet  "${address}" is :  "${balanceEther}"`);
